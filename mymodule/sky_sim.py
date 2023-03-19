@@ -1,20 +1,24 @@
-# Determine Andromeda location in ra/dec degrees 
+"""
+A script to simulate a population of stars around the Andromeda galaxy.
+"""
 
-from math import cos, pi          
-from random import uniform
+import math          
+import random
 
+
+# determine Andromeda location in ra/dec degrees. 
 # assign RA and Dec a constant value (for now) from wikipedia
-ra= '00:42:44.3' 
-dec = '41:16:09'  
+RA = '00:42:44.3' 
+DEC = '41:16:09'  
 
 
 # convert to decimal degrees
-d, m, s = dec.split(':')
+d, m, s = DEC.split(':')
 dec = int(d)+int(m)/60+float(s)/3600
 
-h, m, s = ra.split(':')
+h, m, s = RA.split(':')
 ra = 15*(int(h)+int(m)/60+float(s)/3600)
-ra = ra/cos(dec*pi/180)
+ra = ra/math.cos(dec*pi/180)
 
 NSRC = 1_000_000
 
@@ -23,12 +27,12 @@ NSRC = 1_000_000
 ras = []
 decs = []
 for i in range(NSRC):
-    ras.append(ra + uniform(-1,1))
-    decs.append(dec + uniform(-1,1))
+    ras.append(ra + random.uniform(-1,1))
+    decs.append(dec + random.uniform(-1,1))
 
 
 # now write these to a csv file for use by my other program
-f = open('catalog.csv','w', encoding='utf8')
+f = open('catalog.csv','w', encoding='utf-8')
 # ^- Consider using 'with' for resource-allocating operations (consider-using-with)
 
 print("id,ra,dec", file=f)
