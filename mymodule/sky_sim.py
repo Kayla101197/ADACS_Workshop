@@ -4,6 +4,8 @@ A script to simulate a population of stars around the Andromeda galaxy.
 
 import math
 import random
+from typing import Tuple, List
+import argparse
 
 
 NSRC = 1_000_000
@@ -32,7 +34,7 @@ def get_radec():
 
 
 
-def make_stars(ra:float, dec:float, num_stars:int) -> tuple(List(float),List(float)):
+def make_stars(ra:float, dec:float, num_stars:int) -> Tuple[List[float],List[float]]:
     """
     Make 1000 stars within 1 degree of Andromeda
     """
@@ -45,12 +47,41 @@ def make_stars(ra:float, dec:float, num_stars:int) -> tuple(List(float),List(flo
     return (ras, decs)
 
 
+def skysim_parser():
+    """
+    Configure the argparse for skysim
+
+    Returns
+    -------
+    parser : argparse.ArgumentParser
+        The parser for skysim.
+    """
+    parser = argparse.ArgumentParser(prog='sky_sim', prefix_chars='-')
+    parser.add_argument('--ra', dest = 'ra', type=float, default=None,
+                        help="Central ra (degrees) for the simulation location")
+    parser.add_argument('--dec', dest = 'dec', type=float, default=None,
+                        help="Central dec (degrees) for the simulation location")
+    parser.add_argument('--out', dest='out', type=str, default='catalog.csv',
+                        help='destination for the output catalog')
+    return parser
+
+
+
+
 def main():
-    ra, dec = get_radec()
+    parser = skysim_parser()
+    options = parser.parse_args()
+    # if ra/dec are not supplied the use a default value
+    if None in [options.ra, options.dec]:
+        ra, dec = get_radec()
+    else:
+        ra = options.ra
+        dec = options.dec
+
     ras, decs = make_stars(ra, dec, NSRC)
 
     # now write these to a csv file for use by my other program
-    with open('catalog.csv','w',encoding='utf-8') as f:
+    with open(options.out,'w',encoding='utf-8') as f:
         print("id,ra,dec", file=f)
         for i in range(NSRC):
             print(f"{i:07d}, {ras[i]:12f}, {decs[i]:12f}", file=f)
